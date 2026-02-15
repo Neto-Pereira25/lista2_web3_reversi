@@ -3,8 +3,15 @@ const socket = new WebSocket("ws://localhost:3000");
 const boardDiv = document.getElementById("board");
 const infoDiv = document.getElementById("info");
 
+let myColor = null;
+
 socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
+
+    if (message.type === "WELCOME") {
+        myColor = message.payload.color;
+        alert("Você é: " + myColor);
+    }
 
     if (message.type === "STATE") {
         renderBoard(message.payload);
