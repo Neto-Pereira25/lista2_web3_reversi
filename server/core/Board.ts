@@ -1,4 +1,4 @@
-import { Cell, PlayerColor, Position } from "../types/GameTypes.js";
+import type { Cell, PlayerColor, Position } from "../types/GameTypes.js";
 import { DIRECTIONS } from "./Directions.js";
 
 export class Board {
