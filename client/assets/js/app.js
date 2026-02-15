@@ -1,34 +1,42 @@
 const socket = new WebSocket("ws://localhost:3000");
 
 const boardDiv = document.getElementById("board");
-const infoDiv = document.getElementById("info");
+const gameInfoDiv = document.getElementById("gameInfo");
+const playerInfoDiv = document.getElementById("playerInfo");
 
 let myColor = null;
+let currentTurn = null;
 
 socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
 
     if (message.type === "WELCOME") {
         myColor = message.payload.color;
-        alert("Você é: " + myColor);
+        playerInfoDiv.innerText =
+            "Você é: " + myColor;
     }
 
     if (message.type === "STATE") {
+        currentTurn = message.payload.currentTurn;
         renderBoard(message.payload);
+    }
+
+    if (message.type === "ERROR") {
+        showMessage(message.payload);
     }
 };
 
 function renderBoard(state) {
     boardDiv.innerHTML = "";
 
-    infoDiv.innerHTML = `
+    gameInfoDiv.innerHTML = `
     Turno: ${state.currentTurn}
     | Preto: ${state.blackScore}
     | Branco: ${state.whiteScore}
   `;
 
     if (state.gameOver) {
-        infoDiv.innerHTML += `<br><strong>Fim de jogo! Vencedor: ${state.winner}</strong>`;
+        gameInfoDiv.innerHTML += `<br><strong>Fim de jogo! Vencedor: ${state.winner}</strong>`;
     }
 
     state.board.forEach((row, r) => {
@@ -50,6 +58,17 @@ function renderBoard(state) {
             }
 
             cellDiv.onclick = () => {
+
+                if (myColor === "SPECTATOR") {
+                    showMessage("Você é espectador e não pode jogar.");
+                    return;
+                }
+
+                if (currentTurn !== myColor) {
+                    showMessage("Não é sua vez de jogar.");
+                    return;
+                }
+
                 socket.send(JSON.stringify({
                     type: "MOVE",
                     payload: { row: r, col: c }
@@ -61,7 +80,6 @@ function renderBoard(state) {
     });
 }
 
-
 function joinRoom() {
     const roomId = document.getElementById("roomInput").value;
 
@@ -69,4 +87,13 @@ function joinRoom() {
         type: "JOIN_ROOM",
         payload: { roomId }
     }));
+}
+
+function showMessage(text) {
+    const msg = document.getElementById("message");
+    msg.innerText = text;
+
+    setTimeout(() => {
+        msg.innerText = "";
+    }, 3000);
 }
