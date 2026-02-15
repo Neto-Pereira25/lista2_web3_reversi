@@ -55,9 +55,7 @@ describe("GameSession Multiplayer Logic", () => {
         session.addClient(s1);
         session.addClient(s2);
 
-        const message = { type: "test" };
-
-        session["broadcast"](message);
+        session["broadcast"]();
 
         expect(s1.send).toHaveBeenCalled();
         expect(s2.send).toHaveBeenCalled();
@@ -73,7 +71,7 @@ describe("GameSession Multiplayer Logic", () => {
 
         session.addClient(closedSocket);
 
-        session["broadcast"]({ type: "test" });
+        session["broadcast"]();
 
         expect(closedSocket.send).not.toHaveBeenCalled();
     });

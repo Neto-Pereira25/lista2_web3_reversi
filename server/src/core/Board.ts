@@ -9,14 +9,21 @@ export class Board {
     }
 
     private createInitialBoard(): Cell[][] {
-        const board: Cell[][] = Array.from({ length: 8 }, () =>
-            Array(8).fill("EMPTY")
-        );
+        const board: Cell[][] = [];
 
-        board[3][3] = "BLACK";
-        board[4][4] = "BLACK";
-        board[3][4] = "WHITE";
-        board[4][3] = "WHITE";
+        for (let i = 0; i < 8; i++) {
+            const row: Cell[] = [];
+            for (let j = 0; j < 8; j++) {
+                row.push("EMPTY");
+            }
+            board.push(row);
+        }
+
+
+        board[3]![3] = "BLACK";
+        board[4]![4] = "BLACK";
+        board[3]![4] = "WHITE";
+        board[4]![3] = "WHITE";
 
         return board;
     }
@@ -26,7 +33,7 @@ export class Board {
     }
 
     public isValidMove(pos: Position, player: PlayerColor): boolean {
-        if (this.grid[pos.row][pos.col] !== "EMPTY") return false;
+        if (this.grid[pos.row]![pos.col] !== "EMPTY") return false;
 
         const opponent: PlayerColor = player === "BLACK" ? "WHITE" : "BLACK";
 
@@ -35,7 +42,7 @@ export class Board {
             let c = pos.col + dy;
             let foundOpponent = false;
 
-            while (this.isInside(r, c) && this.grid[r][c] === opponent) {
+            while (this.isInside(r, c) && this.grid[r]![c] === opponent) {
                 foundOpponent = true;
                 r += dx;
                 c += dy;
@@ -44,7 +51,7 @@ export class Board {
             if (
                 foundOpponent &&
                 this.isInside(r, c) &&
-                this.grid[r][c] === player
+                this.grid[r]![c] === player
             ) {
                 return true;
             }
@@ -58,22 +65,22 @@ export class Board {
 
         const opponent: PlayerColor = player === "BLACK" ? "WHITE" : "BLACK";
 
-        this.grid[pos.row][pos.col] = player;
+        this.grid[pos.row]![pos.col] = player;
 
         for (const [dx, dy] of DIRECTIONS) {
             let r = pos.row + dx;
             let c = pos.col + dy;
             const toFlip: Position[] = [];
 
-            while (this.isInside(r, c) && this.grid[r][c] === opponent) {
+            while (this.isInside(r, c) && this.grid[r]![c] === opponent) {
                 toFlip.push({ row: r, col: c });
                 r += dx;
                 c += dy;
             }
 
-            if (this.isInside(r, c) && this.grid[r][c] === player) {
+            if (this.isInside(r, c) && this.grid[r]![c] === player) {
                 for (const p of toFlip) {
-                    this.grid[p.row][p.col] = player;
+                    this.grid[p.row]![p.col] = player;
                 }
             }
         }
@@ -109,4 +116,15 @@ export class Board {
     private isInside(r: number, c: number): boolean {
         return r >= 0 && r < 8 && c >= 0 && c < 8;
     }
+
+    private getCell(row: number, col: number) {
+        if (!this.isInside(row, col)) return undefined;
+        return this.grid[row]![col]!;
+    }
+
+    private setCell(row: number, col: number, value: Cell) {
+        if (!this.isInside(row, col)) return;
+        this.grid[row]![col]! = value;
+    }
+
 }

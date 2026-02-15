@@ -53,7 +53,7 @@ describe("Game Flow", () => {
             }
         }
 
-        board[7][7] = null;
+        board[7][7] = "EMPTY";
 
         game["checkGameOver"]();
 
