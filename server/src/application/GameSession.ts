@@ -70,4 +70,8 @@ export class GameSession {
     public removeClient(id: string) {
         this.clients = this.clients.filter(c => c.id !== id);
     }
+
+    public isEmpty(): boolean {
+        return this.clients.length === 0;
+    }
 }
