@@ -8,6 +8,8 @@ export interface GameStateDTO {
     blackScore: number;
     whiteScore: number;
     gameOver: boolean;
+    validMoves: Position[];
+    winner?: PlayerColor | "DRAW";
 }
 
 export interface Player {
