@@ -39,6 +39,7 @@ export class GameSession {
 
     public handleMove(clientId: string, row: number, col: number): boolean {
         const client = this.clients.find(c => c.id === clientId);
+
         if (!client || !client.color) return false;
 
         const state = this.game.getState();

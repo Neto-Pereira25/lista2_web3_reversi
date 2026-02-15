@@ -43,3 +43,12 @@ function renderBoard(state) {
         });
     });
 }
+
+function joinRoom() {
+    const roomId = document.getElementById("roomInput").value;
+
+    socket.send(JSON.stringify({
+        type: "JOIN_ROOM",
+        payload: { roomId }
+    }));
+}

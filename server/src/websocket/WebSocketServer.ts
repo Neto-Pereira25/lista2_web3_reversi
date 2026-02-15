@@ -1,6 +1,5 @@
 import WebSocket, { WebSocketServer } from "ws";
 import { RoomManager } from "../application/RoomManager.js";
-import { randomUUID } from "crypto";
 
 interface ClientContext {
     id: string;
@@ -19,7 +18,7 @@ export class ReversiServer {
 
         this.wss.on("connection", (ws) => {
             const context: ClientContext = {
-                id: randomUUID(),
+                id: "",
                 socket: ws
             };
 
@@ -32,13 +31,17 @@ export class ReversiServer {
                     const room = this.roomManager.getOrCreateRoom(data.payload.roomId);
 
                     context.roomId = data.payload.roomId;
-                    const client = room.addClient(ws);
+
+                    const player = room.addClient(ws);
+
+                    // 🔥 IMPORTANTE: usar o ID retornado pelo GameSession
+                    context.id = player.id;
 
                     ws.send(JSON.stringify({
                         type: "WELCOME",
                         payload: {
-                            playerId: client.id,
-                            color: client.color ?? "SPECTATOR",
+                            playerId: player.id,
+                            color: player.color ?? "SPECTATOR",
                             roomId: context.roomId
                         }
                     }));
