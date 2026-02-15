@@ -11,6 +11,7 @@ const whiteScoreSpan = document.getElementById("whiteScore");
 
 let myColor = null;
 let currentTurn = null;
+let gameFinished = false;
 
 socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
@@ -58,13 +59,11 @@ function renderBoard(state) {
     blackScoreSpan.innerText = state.blackScore;
     whiteScoreSpan.innerText = state.whiteScore;
 
-    if (state.gameOver) {
-        showMessage(
-            state.winner === "DRAW"
-                ? "Fim de jogo! Empate!"
-                : `Fim de jogo! Vencedor: ${state.winner === "BLACK" ? "Preto" : "Branco"}`
-        );
+    if (state.gameOver && !gameFinished) {
+        gameFinished = true;
+        showGameOverModal(state.winner);
     }
+
 
     state.board.forEach((row, r) => {
         row.forEach((cell, c) => {
@@ -129,4 +128,34 @@ function showMessage(text) {
     setTimeout(() => {
         msg.innerHTML = "";
     }, 3000);
+}
+
+function showGameOverModal(winner) {
+
+    const modalResult = document.getElementById("modalResult");
+
+    if (winner === "DRAW") {
+        modalResult.innerText = "A partida terminou em empate!";
+    } else {
+        modalResult.innerText =
+            winner === "BLACK"
+                ? "Jogador Preto venceu!"
+                : "Jogador Branco venceu!";
+    }
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("gameOverModal")
+    );
+
+    modal.show();
+}
+
+function closeModal() {
+    const modalElement = document.getElementById("gameOverModal");
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    modal.hide();
+
+    // Reset cliente
+    boardDiv.innerHTML = "";
+    gameFinished = false;
 }

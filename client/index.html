@@ -10,58 +10,93 @@
     />
     <link rel="stylesheet" href="./assets/styles/style.css" />
   </head>
-  <body>
-    <div class="container">
-      <div class="sidebar p-3">
-        <h3 class="text-center mb-4">Reversi Online</h3>
+  <body class="bg-dark text-white">
+    <div class="container-fluid">
+      <div class="row vh-100">
+        <!-- SIDEBAR -->
+        <div class="col-md-3 bg-black p-4 d-flex flex-column">
+          <h3 class="text-center mb-4">Reversi Online</h3>
 
-        <div class="mb-3">
-          <input id="roomInput" class="form-control" placeholder="ID da Sala" />
-          <button onclick="joinRoom()" class="btn btn-primary w-100 mt-2">
-            Entrar na Sala
-          </button>
-        </div>
-
-        <hr />
-
-        <div class="card bg-dark text-white mb-3">
-          <div class="card-body">
-            <h6 class="card-title">Jogador</h6>
-            <span id="playerBadge" class="badge bg-secondary">
-              Não conectado
-            </span>
+          <!-- Entrada de Sala -->
+          <div class="mb-4">
+            <input
+              id="roomInput"
+              class="form-control"
+              placeholder="ID da Sala"
+            />
+            <button onclick="joinRoom()" class="btn btn-primary w-100 mt-2">
+              Entrar na Sala
+            </button>
           </div>
-        </div>
 
-        <div class="card bg-dark text-white mb-3">
-          <div class="card-body">
-            <h6 class="card-title">Turno</h6>
-            <span id="turnBadge" class="badge bg-warning text-dark"> - </span>
-          </div>
-        </div>
+          <hr />
 
-        <div class="card bg-dark text-white">
-          <div class="card-body">
-            <h6 class="card-title">Placar</h6>
-
-            <div class="d-flex justify-content-between">
-              <span>⚫ Preto</span>
-              <span id="blackScore">0</span>
-            </div>
-
-            <div class="d-flex justify-content-between">
-              <span>⚪ Branco</span>
-              <span id="whiteScore">0</span>
+          <!-- Jogador -->
+          <div class="card bg-dark text-white mb-3">
+            <div class="card-body text-center">
+              <h6 class="card-title">Jogador</h6>
+              <span id="playerBadge" class="badge bg-secondary">
+                Não conectado
+              </span>
             </div>
           </div>
+
+          <!-- Turno -->
+          <div class="card bg-dark text-white mb-3">
+            <div class="card-body text-center">
+              <h6 class="card-title">Turno</h6>
+              <span id="turnBadge" class="badge bg-warning text-dark"> - </span>
+            </div>
+          </div>
+
+          <!-- Placar -->
+          <div class="card bg-dark text-white mb-3">
+            <div class="card-body">
+              <h6 class="card-title text-center">Placar</h6>
+
+              <div class="d-flex justify-content-between">
+                <span>⚫ Preto</span>
+                <span id="blackScore">0</span>
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <span>⚪ Branco</span>
+                <span id="whiteScore">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensagens -->
+          <div id="message" class="mt-auto"></div>
         </div>
 
-        <div id="message" class="mt-3"></div>
+        <!-- TABULEIRO -->
+        <div class="col-md-9 d-flex align-items-center justify-content-center">
+          <div id="board" class="board"></div>
+        </div>
       </div>
-
-      <div id="board" class="board"></div>
     </div>
 
+    <!-- MODAL FIM DE JOGO -->
+    <div class="modal fade" id="gameOverModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Fim de Jogo</h5>
+          </div>
+          <div class="modal-body text-center">
+            <h4 id="modalResult"></h4>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button class="btn btn-primary" onclick="closeModal()">
+              Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./assets/js/app.js"></script>
   </body>
 </html>

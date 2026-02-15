@@ -75,4 +75,9 @@ export class GameSession {
     public isEmpty(): boolean {
         return this.clients.length === 0;
     }
+
+    public isGameOver(): boolean {
+        return this.game.getState().gameOver;
+    }
+
 }
