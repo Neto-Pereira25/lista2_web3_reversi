@@ -1,33 +1,58 @@
-import { WebSocketServer } from "ws";
-import { GameSession } from "../application/GameSession.js";
+import WebSocket, { WebSocketServer } from "ws";
+import { RoomManager } from "../application/RoomManager.js";
+import { randomUUID } from "crypto";
+
+interface ClientContext {
+    id: string;
+    socket: WebSocket;
+    roomId?: string;
+}
 
 export class ReversiServer {
     private wss: WebSocketServer;
-    private session: GameSession;
+    private roomManager: RoomManager;
+    private clients: Map<WebSocket, ClientContext> = new Map();
 
     constructor(port: number) {
         this.wss = new WebSocketServer({ port });
-        this.session = new GameSession();
+        this.roomManager = new RoomManager();
 
         this.wss.on("connection", (ws) => {
-            const client = this.session.addClient(ws);
+            const context: ClientContext = {
+                id: randomUUID(),
+                socket: ws
+            };
 
-            ws.send(JSON.stringify({
-                type: "WELCOME",
-                payload: {
-                    playerId: client.id,
-                    color: client.color ?? "SPECTATOR"
-                }
-            }));
-
-            this.session.broadcast();
+            this.clients.set(ws, context);
 
             ws.on("message", (message) => {
                 const data = JSON.parse(message.toString());
 
+                if (data.type === "JOIN_ROOM") {
+                    const room = this.roomManager.getOrCreateRoom(data.payload.roomId);
+
+                    context.roomId = data.payload.roomId;
+                    const client = room.addClient(ws);
+
+                    ws.send(JSON.stringify({
+                        type: "WELCOME",
+                        payload: {
+                            playerId: client.id,
+                            color: client.color ?? "SPECTATOR",
+                            roomId: context.roomId
+                        }
+                    }));
+
+                    room.broadcast();
+                }
+
                 if (data.type === "MOVE") {
-                    const success = this.session.handleMove(
-                        client.id,
+                    if (!context.roomId) return;
+
+                    const room = this.roomManager.getOrCreateRoom(context.roomId);
+
+                    const success = room.handleMove(
+                        context.id,
                         data.payload.row,
                         data.payload.col
                     );
@@ -35,16 +60,21 @@ export class ReversiServer {
                     if (!success) {
                         ws.send(JSON.stringify({
                             type: "ERROR",
-                            payload: "Jogada inválida ou não é seu turno"
+                            payload: "Jogada inválida"
                         }));
                     }
 
-                    this.session.broadcast();
+                    room.broadcast();
                 }
             });
 
             ws.on("close", () => {
-                this.session.removeClient(client.id);
+                const context = this.clients.get(ws);
+                if (!context?.roomId) return;
+
+                const room = this.roomManager.getOrCreateRoom(context.roomId);
+                room.removeClient(context.id);
+                this.roomManager.removeRoomIfEmpty(context.roomId);
             });
         });
 
