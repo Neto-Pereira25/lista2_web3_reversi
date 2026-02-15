@@ -4,6 +4,11 @@ const boardDiv = document.getElementById("board");
 const gameInfoDiv = document.getElementById("gameInfo");
 const playerInfoDiv = document.getElementById("playerInfo");
 
+const playerBadge = document.getElementById("playerBadge");
+const turnBadge = document.getElementById("turnBadge");
+const blackScoreSpan = document.getElementById("blackScore");
+const whiteScoreSpan = document.getElementById("whiteScore");
+
 let myColor = null;
 let currentTurn = null;
 
@@ -12,8 +17,17 @@ socket.onmessage = (event) => {
 
     if (message.type === "WELCOME") {
         myColor = message.payload.color;
-        playerInfoDiv.innerText =
-            "Você é: " + myColor;
+
+        if (myColor === "BLACK") {
+            playerBadge.className = "badge bg-dark";
+            playerBadge.innerText = "Preto";
+        } else if (myColor === "WHITE") {
+            playerBadge.className = "badge bg-light text-dark";
+            playerBadge.innerText = "Branco";
+        } else {
+            playerBadge.className = "badge bg-secondary";
+            playerBadge.innerText = "Espectador";
+        }
     }
 
     if (message.type === "STATE") {
@@ -29,14 +43,27 @@ socket.onmessage = (event) => {
 function renderBoard(state) {
     boardDiv.innerHTML = "";
 
-    gameInfoDiv.innerHTML = `
-    Turno: ${state.currentTurn}
-    | Preto: ${state.blackScore}
-    | Branco: ${state.whiteScore}
-  `;
+    currentTurn = state.currentTurn;
+
+    // Atualizar turno
+    if (state.currentTurn === "BLACK") {
+        turnBadge.className = "badge bg-dark";
+        turnBadge.innerText = "Preto";
+    } else {
+        turnBadge.className = "badge bg-light text-dark";
+        turnBadge.innerText = "Branco";
+    }
+
+    // Atualizar placar
+    blackScoreSpan.innerText = state.blackScore;
+    whiteScoreSpan.innerText = state.whiteScore;
 
     if (state.gameOver) {
-        gameInfoDiv.innerHTML += `<br><strong>Fim de jogo! Vencedor: ${state.winner}</strong>`;
+        showMessage(
+            state.winner === "DRAW"
+                ? "Fim de jogo! Empate!"
+                : `Fim de jogo! Vencedor: ${state.winner === "BLACK" ? "Preto" : "Branco"}`
+        );
     }
 
     state.board.forEach((row, r) => {
@@ -91,9 +118,15 @@ function joinRoom() {
 
 function showMessage(text) {
     const msg = document.getElementById("message");
-    msg.innerText = text;
+
+    msg.innerHTML = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            ${text}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
 
     setTimeout(() => {
-        msg.innerText = "";
+        msg.innerHTML = "";
     }, 3000);
 }
