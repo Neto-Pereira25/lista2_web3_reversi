@@ -34,4 +34,27 @@ describe("Board - Reversi Rules", () => {
         expect(grid[3][3]).toBe("BLACK");
     });
 
+    test("Deve capturar peça horizontalmente", () => {
+        const board = new Board();
+        const grid = board.getBoard();
+
+        // Limpar posição estratégica
+        grid[3][2] = "WHITE";
+        grid[3][1] = "BLACK";
+        grid[3][3] = "EMPTY";
+
+        const valid = board.isValidMove({ row: 3, col: 3 }, "BLACK");
+        expect(valid).toBe(true);
+
+        board.applyMove({ row: 3, col: 3 }, "BLACK");
+
+        expect(grid[3][2]).toBe("BLACK");
+    });
+
+    test("Jogada sem capturar peças deve ser inválida", () => {
+        const board = new Board();
+
+        expect(board.isValidMove({ row: 0, col: 0 }, "BLACK")).toBe(false);
+    });
+
 });
