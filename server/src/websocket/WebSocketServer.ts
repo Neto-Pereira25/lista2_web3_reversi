@@ -24,7 +24,7 @@ export class ReversiServer {
     private initialize() {
         this.wss.on("connection", (ws: WebSocket) => {
             const context: ClientContext = {
-                id: "", // será definido ao entrar na sala
+                id: "",
                 socket: ws
             };
 
@@ -59,9 +59,6 @@ export class ReversiServer {
         });
     }
 
-    // ===============================
-    // JOIN ROOM
-    // ===============================
     private handleJoinRoom(
         ws: WebSocket,
         context: ClientContext,
@@ -78,7 +75,6 @@ export class ReversiServer {
 
         const player = room.addClient(ws);
 
-        // 🔥 Sincroniza ID corretamente
         context.id = player.id;
 
         ws.send(JSON.stringify({
@@ -93,9 +89,6 @@ export class ReversiServer {
         room.broadcast();
     }
 
-    // ===============================
-    // HANDLE MOVE
-    // ===============================
     private handleMove(
         ws: WebSocket,
         context: ClientContext,
@@ -118,7 +111,6 @@ export class ReversiServer {
 
         room.broadcast();
 
-        // 🔥 Se jogo terminou, encerrar sala após 3 segundos
         const state = room.getGameState();
 
         if (state.gameOver) {
@@ -128,9 +120,6 @@ export class ReversiServer {
         }
     }
 
-    // ===============================
-    // DISCONNECT
-    // ===============================
     private handleDisconnect(ws: WebSocket) {
         const context = this.clients.get(ws);
 
@@ -146,9 +135,6 @@ export class ReversiServer {
         this.clients.delete(ws);
     }
 
-    // ===============================
-    // ERROR HANDLER
-    // ===============================
     private sendError(ws: WebSocket, message: string) {
         ws.send(JSON.stringify({
             type: "ERROR",

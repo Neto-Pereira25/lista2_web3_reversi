@@ -74,7 +74,6 @@ function renderBoard(state) {
                 cellDiv.classList.add(cell.toLowerCase());
             }
 
-            // 🔥 destacar jogadas válidas
             const isValid = state.validMoves.some(
                 m => m.row === r && m.col === c
             );
@@ -155,7 +154,6 @@ function closeModal() {
     const modal = bootstrap.Modal.getInstance(modalElement);
     modal.hide();
 
-    // Reset cliente
     boardDiv.innerHTML = "";
     gameFinished = false;
 }
